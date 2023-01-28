@@ -127,7 +127,7 @@ const App = () => {
       {/* PageContainer */}
       <div className="pageContainer">
         <div className="page">
-          {/* {layout.map((row, index) => {
+          {layout.map((row, index) => {
             const currentPath = `${index}`
 
             return (
@@ -144,7 +144,7 @@ const App = () => {
                 {renderRow(row, currentPath)}
               </React.Fragment>
             )
-          })} */}
+          })}
         </div>
 
         {/* TrashDropZone */}
