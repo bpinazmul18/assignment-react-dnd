@@ -6,6 +6,7 @@ import Component from './Component'
 
 const style = {}
 const Column = ({ data, components, handleDrop, path }) => {
+  console.log('check data...', data)
   const ref = useRef(null)
 
   const [{ isDragging }, drag] = useDrag({
@@ -41,7 +42,7 @@ const Column = ({ data, components, handleDrop, path }) => {
       className="base draggable column"
     >
       {data.id}
-      {data.children.map((component, index) => {
+      {data?.children?.map((component, index) => {
         const currentPath = `${path}-${index}`
 
         return (
