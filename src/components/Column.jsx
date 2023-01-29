@@ -6,7 +6,7 @@ import Component from './Component'
 
 const style = {}
 const Column = ({ data, components, handleDrop, path }) => {
-  console.log('check data...', data)
+  console.log('CHECK("column" data: ', data)
   const ref = useRef(null)
 
   const [{ isDragging }, drag] = useDrag({
