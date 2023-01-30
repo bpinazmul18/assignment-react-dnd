@@ -39,7 +39,7 @@ const Row = ({ data, components, handleDrop, path }) => {
     <div ref={ref} style={{ ...style, opacity }} className="base draggable row">
       {data.id}
       <div className="columns">
-        {data.children.map((column, index) => {
+        {data?.children?.map((column, index) => {
           const currentPath = `${path}-${index}`
 
           return (
@@ -58,8 +58,8 @@ const Row = ({ data, components, handleDrop, path }) => {
         })}
         <DropZone
           data={{
-            path: `${path}-${data.children.length}`,
-            childrenCount: data.children.length,
+            path: `${path}-${data?.children?.length}`,
+            childrenCount: data?.children?.length,
           }}
           onDrop={handleDrop}
           className="horizontalDrag"

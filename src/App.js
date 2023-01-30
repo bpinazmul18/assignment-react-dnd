@@ -4,7 +4,13 @@ import DropZone from './components/DropZone'
 import Row from './components/Row'
 import SideBarItem from './components/SideBarItem'
 import TrashDropZone from './components/TrashDropZone'
-import { SIDEBAR_ITEMS, COLUMN, SIDEBAR_ITEM, COMPONENT } from './constants'
+import {
+  SIDEBAR_ITEMS,
+  COLUMN,
+  SIDEBAR_ITEM,
+  COMPONENT,
+  ROW,
+} from './constants'
 import initialData from './initial-data'
 
 import {
@@ -35,6 +41,43 @@ const App = () => {
       const pathToDropZone = splitDropZonePath.slice(0, -1).join('-')
 
       const newItem = { id: item.id, type: item.type }
+
+      console.log('check item type', item)
+      // Row
+      if (item.type === ROW) {
+        return setLayout(
+          handleMoveSidebarComponentIntoParent(
+            layout,
+            splitDropZonePath,
+            newItem
+          )
+        )
+        // 1. Move sidebar item into page
+        // const newComponent = {
+        //   id: shortid.generate(),
+        //   ...item.component,
+        // }
+
+        // const newItem = {
+        //   id: newComponent.id,
+        //   type: COMPONENT,
+        // }
+
+        // setComponents({
+        //   ...components,
+        //   [newComponent.id]: newComponent,
+        // })
+
+        // setLayout(
+        //   handleMoveSidebarComponentIntoParent(
+        //     layout,
+        //     splitDropZonePath,
+        //     newItem
+        //   )
+        // )
+        return
+      }
+
       if (item.type === COLUMN) {
         newItem.children = item.children
       }
@@ -66,6 +109,7 @@ const App = () => {
 
       // move down here since sidebar items dont have path
       const splitItemPath = item.path.split('-')
+
       const pathToItem = splitItemPath.slice(0, -1).join('-')
 
       // 2. Pure move (no create)

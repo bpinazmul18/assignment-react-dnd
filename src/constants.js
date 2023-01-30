@@ -46,4 +46,20 @@ export const SIDEBAR_ITEMS = [
       content: 'Some image',
     },
   },
+  {
+    id: shortid.generate(),
+    type: ROW,
+    component: {
+      type: ROW,
+      content: 'Some Row',
+    },
+  },
+  {
+    id: shortid.generate(),
+    type: SIDEBAR_ITEM,
+    component: {
+      type: COLUMN,
+      content: 'Some Column',
+    },
+  },
 ]
