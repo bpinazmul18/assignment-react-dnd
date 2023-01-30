@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { useDrag } from 'react-dnd'
-import { ROW as RowType } from '../constants'
+import { ROW } from '../constants'
 import DropZone from './DropZone'
 import Column from './Column'
 
@@ -9,7 +9,7 @@ const Row = ({ data, components, handleDrop, path }) => {
   const ref = useRef(null)
 
   const [{ isDragging }, drag] = useDrag({
-    type: RowType,
+    type: ROW,
     item: {
       id: data.id,
       children: data.children,

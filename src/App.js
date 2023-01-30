@@ -17,6 +17,7 @@ import {
 const App = () => {
   const initialLayout = initialData.layout
   const initialComponents = initialData.components
+  const dropZoneInitialPath = 0
   const [layout, setLayout] = useState(initialLayout)
   const [components, setComponents] = useState(initialComponents)
 
@@ -145,6 +146,15 @@ const App = () => {
               </React.Fragment>
             )
           })}
+
+          <DropZone
+            data={{
+              path: String(dropZoneInitialPath),
+              childrenCount: layout.length,
+            }}
+            onDrop={handleDrop}
+            path={String(dropZoneInitialPath)}
+          />
         </div>
 
         {/* TrashDropZone */}

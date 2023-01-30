@@ -49,7 +49,7 @@ const Column = ({ data, components, handleDrop, path }) => {
             <DropZone
               data={{
                 path: currentPath,
-                childrenCount: data.children.length,
+                childrenCount: data?.children?.length,
               }}
               onDrop={handleDrop}
             />
@@ -59,8 +59,8 @@ const Column = ({ data, components, handleDrop, path }) => {
       })}
       <DropZone
         data={{
-          path: `${path}-${data.children.length}`,
-          childrenCount: data.children.length,
+          path: `${path}-${data?.children?.length}`,
+          childrenCount: data?.children?.length,
         }}
         onDrop={handleDrop}
         isLast

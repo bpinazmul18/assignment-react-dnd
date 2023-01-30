@@ -31,7 +31,7 @@ const Component = ({ data, components, path }) => {
       className="component draggable"
     >
       <div>{data.id}</div>
-      <div>{component.content}</div>
+      <div>{component?.content}</div>
     </div>
   )
 }
