@@ -12,8 +12,7 @@ const Component = ({ data, components, path }) => {
   const ref = useRef(null)
 
   const [{ isDragging }, drag] = useDrag({
-    type: COMPONENT,
-    item: { id: data.id, path },
+    item: { type: COMPONENT, id: data.id, path },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -31,7 +30,7 @@ const Component = ({ data, components, path }) => {
       className="component draggable"
     >
       <div>{data.id}</div>
-      <div>{component?.content}</div>
+      <div>{component.content}</div>
     </div>
   )
 }

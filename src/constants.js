@@ -50,16 +50,16 @@ export const SIDEBAR_ITEMS = [
     id: shortid.generate(),
     type: SIDEBAR_ITEM,
     component: {
-      type: ROW,
-      content: 'Some Row',
+      type: 'Row',
+      content: 'Row',
     },
   },
   {
     id: shortid.generate(),
     type: SIDEBAR_ITEM,
     component: {
-      type: COLUMN,
-      content: 'Some Column',
+      type: 'Column',
+      content: 'Column',
     },
   },
 ]

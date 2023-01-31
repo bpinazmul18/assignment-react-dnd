@@ -1,6 +1,15 @@
 import shortid from 'shortid'
 import { ROW, COLUMN, COMPONENT } from './constants'
 
+// a little function to help us with reordering the result
+export const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed) // inserting task in new index
+
+  return result
+}
+
 export const remove = (arr, index) => [
   // part of the array before the specified index
   ...arr.slice(0, index),
@@ -17,20 +26,55 @@ export const insert = (arr, index, newItem) => [
   ...arr.slice(index),
 ]
 
-export const handleAddColumDataToRow = (layout) => {
-  const layoutCopy = [...layout]
-  const COLUMN_STRUCTURE = {
-    type: COLUMN,
-    id: shortid.generate(),
-    children: [],
+export const reorderChildren = (children, splitDropZonePath, splitItemPath) => {
+  if (splitDropZonePath.length === 1) {
+    const dropZoneIndex = Number(splitDropZonePath[0])
+    const itemIndex = Number(splitItemPath[0])
+    return reorder(children, itemIndex, dropZoneIndex)
   }
 
-  return layoutCopy.map((row) => {
-    if (!row.children.length) {
-      row.children = [COLUMN_STRUCTURE]
-    }
-    return row
-  })
+  const updatedChildren = [...children]
+
+  const curIndex = Number(splitDropZonePath.slice(0, 1))
+
+  // Update the specific node's children
+  const splitDropZoneChildrenPath = splitDropZonePath.slice(1)
+  const splitItemChildrenPath = splitItemPath.slice(1)
+  const nodeChildren = updatedChildren[curIndex]
+  updatedChildren[curIndex] = {
+    ...nodeChildren,
+    children: reorderChildren(
+      nodeChildren.children,
+      splitDropZoneChildrenPath,
+      splitItemChildrenPath
+    ),
+  }
+
+  return updatedChildren
+}
+
+export const removeChildFromChildren = (children, splitItemPath) => {
+  if (splitItemPath.length === 1) {
+    const itemIndex = Number(splitItemPath[0])
+    return remove(children, itemIndex)
+  }
+
+  const updatedChildren = [...children]
+
+  const curIndex = Number(splitItemPath.slice(0, 1))
+
+  // Update the specific node's children
+  const splitItemChildrenPath = splitItemPath.slice(1)
+  const nodeChildren = updatedChildren[curIndex]
+  updatedChildren[curIndex] = {
+    ...nodeChildren,
+    children: removeChildFromChildren(
+      nodeChildren.children,
+      splitItemChildrenPath
+    ),
+  }
+
+  return updatedChildren
 }
 
 export const addChildToChildren = (children, splitDropZonePath, item) => {
@@ -58,28 +102,28 @@ export const addChildToChildren = (children, splitDropZonePath, item) => {
   return updatedChildren
 }
 
-export const removeChildFromChildren = (children, splitItemPath) => {
-  console.log('check children: ', children)
-  console.log('check splitItemPath: ', splitItemPath)
+export const handleMoveWithinParent = (
+  layout,
+  splitDropZonePath,
+  splitItemPath
+) => {
+  return reorderChildren(layout, splitDropZonePath, splitItemPath)
+}
 
-  if (splitItemPath.length === 1) {
-    const itemIndex = Number(splitItemPath[0])
-    return remove(children, itemIndex)
+export const handleAddColumDataToRow = (layout) => {
+  const layoutCopy = [...layout]
+  const COLUMN_STRUCTURE = {
+    type: COLUMN,
+    id: shortid.generate(),
+    children: [],
   }
 
-  const updatedChildren = [...children]
-  const curIndex = Number(splitItemPath.slice(0, 1))
-  // Update the specific node's children
-  const splitItemChildrenPath = splitItemPath.slice(1)
-  const nodeChildren = updatedChildren[curIndex]
-  updatedChildren[curIndex] = {
-    ...nodeChildren,
-    children: removeChildFromChildren(
-      nodeChildren.children,
-      splitItemChildrenPath
-    ),
-  }
-  return updatedChildren
+  return layoutCopy.map((row) => {
+    if (!row.children.length) {
+      row.children = [COLUMN_STRUCTURE]
+    }
+    return row
+  })
 }
 
 export const handleMoveToDifferentParent = (
@@ -89,16 +133,15 @@ export const handleMoveToDifferentParent = (
   item
 ) => {
   let newLayoutStructure
-
-  const ROW_STRUCTURE = {
-    type: ROW,
-    id: shortid.generate(),
-  }
-
   const COLUMN_STRUCTURE = {
     type: COLUMN,
     id: shortid.generate(),
     children: [item],
+  }
+
+  const ROW_STRUCTURE = {
+    type: ROW,
+    id: shortid.generate(),
   }
 
   switch (splitDropZonePath.length) {
@@ -113,7 +156,7 @@ export const handleMoveToDifferentParent = (
         // moving component outside into new row made on the fly
         newLayoutStructure = {
           ...ROW_STRUCTURE,
-          children: [],
+          children: [COLUMN_STRUCTURE],
         }
       }
       break
@@ -137,8 +180,6 @@ export const handleMoveToDifferentParent = (
   let updatedLayout = layout
   updatedLayout = removeChildFromChildren(updatedLayout, splitItemPath)
   updatedLayout = handleAddColumDataToRow(updatedLayout)
-  console.log('check updateLayout: ', updatedLayout)
-
   updatedLayout = addChildToChildren(
     updatedLayout,
     splitDropZonePath,
@@ -146,4 +187,39 @@ export const handleMoveToDifferentParent = (
   )
 
   return updatedLayout
+}
+
+export const handleMoveSidebarComponentIntoParent = (
+  layout,
+  splitDropZonePath,
+  item
+) => {
+  let newLayoutStructure
+  switch (splitDropZonePath.length) {
+    case 1: {
+      newLayoutStructure = {
+        type: ROW,
+        id: shortid.generate(),
+        children: [{ type: COLUMN, id: shortid.generate(), children: [item] }],
+      }
+      break
+    }
+    case 2: {
+      newLayoutStructure = {
+        type: COLUMN,
+        id: shortid.generate(),
+        children: [item],
+      }
+      break
+    }
+    default: {
+      newLayoutStructure = item
+    }
+  }
+
+  return addChildToChildren(layout, splitDropZonePath, newLayoutStructure)
+}
+
+export const handleRemoveItemFromLayout = (layout, splitItemPath) => {
+  return removeChildFromChildren(layout, splitItemPath)
 }

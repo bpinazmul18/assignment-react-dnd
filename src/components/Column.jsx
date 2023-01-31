@@ -9,8 +9,8 @@ const Column = ({ data, components, handleDrop, path }) => {
   const ref = useRef(null)
 
   const [{ isDragging }, drag] = useDrag({
-    type: COLUMN,
     item: {
+      type: COLUMN,
       id: data.id,
       children: data.children,
       path,
@@ -41,7 +41,7 @@ const Column = ({ data, components, handleDrop, path }) => {
       className="base draggable column"
     >
       {data.id}
-      {data?.children?.map((component, index) => {
+      {data.children.map((component, index) => {
         const currentPath = `${path}-${index}`
 
         return (
@@ -49,7 +49,7 @@ const Column = ({ data, components, handleDrop, path }) => {
             <DropZone
               data={{
                 path: currentPath,
-                childrenCount: data?.children?.length,
+                childrenCount: data.children.length,
               }}
               onDrop={handleDrop}
             />
@@ -59,8 +59,8 @@ const Column = ({ data, components, handleDrop, path }) => {
       })}
       <DropZone
         data={{
-          path: `${path}-${data?.children?.length}`,
-          childrenCount: data?.children?.length,
+          path: `${path}-${data.children.length}`,
+          childrenCount: data.children.length,
         }}
         onDrop={handleDrop}
         isLast
