@@ -1,18 +1,10 @@
 import React, { useState, useCallback } from 'react'
-import shortid from 'shortid'
-import DropZone from './components/DropZone'
-import Row from './components/Row'
-import SideBarItem from './components/SideBarItem'
-import TrashDropZone from './components/TrashDropZone'
-import {
-  SIDEBAR_ITEMS,
-  COLUMN,
-  SIDEBAR_ITEM,
-  COMPONENT,
-  ROW,
-} from './constants'
-import initialData from './initial-data'
 
+import DropZone from './components/DropZone'
+import TrashDropZone from './components/TrashDropZone'
+import SideBarItem from './components/SideBarItem'
+import Row from './components/Row'
+import initialData from './initial-data'
 import {
   handleMoveWithinParent,
   handleMoveToDifferentParent,
@@ -20,10 +12,12 @@ import {
   handleRemoveItemFromLayout,
 } from './helpers'
 
-const App = () => {
+import { SIDEBAR_ITEMS, SIDEBAR_ITEM, COMPONENT, COLUMN } from './constants'
+import shortid from 'shortid'
+
+const Container = () => {
   const initialLayout = initialData.layout
   const initialComponents = initialData.components
-  const dropZoneInitialPath = 0
   const [layout, setLayout] = useState(initialLayout)
   const [components, setComponents] = useState(initialComponents)
 
@@ -37,47 +31,13 @@ const App = () => {
 
   const handleDrop = useCallback(
     (dropZone, item) => {
+      console.log('dropZone', dropZone)
+      console.log('item', item)
+
       const splitDropZonePath = dropZone.path.split('-')
       const pathToDropZone = splitDropZonePath.slice(0, -1).join('-')
 
       const newItem = { id: item.id, type: item.type }
-
-      console.log('check item type', item)
-      // Row
-      if (item.type === ROW) {
-        return setLayout(
-          handleMoveSidebarComponentIntoParent(
-            layout,
-            splitDropZonePath,
-            newItem
-          )
-        )
-        // 1. Move sidebar item into page
-        // const newComponent = {
-        //   id: shortid.generate(),
-        //   ...item.component,
-        // }
-
-        // const newItem = {
-        //   id: newComponent.id,
-        //   type: COMPONENT,
-        // }
-
-        // setComponents({
-        //   ...components,
-        //   [newComponent.id]: newComponent,
-        // })
-
-        // setLayout(
-        //   handleMoveSidebarComponentIntoParent(
-        //     layout,
-        //     splitDropZonePath,
-        //     newItem
-        //   )
-        // )
-        return
-      }
-
       if (item.type === COLUMN) {
         newItem.children = item.children
       }
@@ -109,7 +69,6 @@ const App = () => {
 
       // move down here since sidebar items dont have path
       const splitItemPath = item.path.split('-')
-
       const pathToItem = splitItemPath.slice(0, -1).join('-')
 
       // 2. Pure move (no create)
@@ -160,16 +119,15 @@ const App = () => {
     )
   }
 
+  // dont use index for key when mapping over items
+  // causes this issue - https://github.com/react-dnd/react-dnd/issues/342
   return (
     <div className="body">
-      {/* SideBar */}
       <div className="sideBar">
-        {Object.values(SIDEBAR_ITEMS).map((sideBarItem) => (
+        {Object.values(SIDEBAR_ITEMS).map((sideBarItem, index) => (
           <SideBarItem key={sideBarItem.id} data={sideBarItem} />
         ))}
       </div>
-
-      {/* PageContainer */}
       <div className="pageContainer">
         <div className="page">
           {layout.map((row, index) => {
@@ -185,23 +143,20 @@ const App = () => {
                   onDrop={handleDrop}
                   path={currentPath}
                 />
-
                 {renderRow(row, currentPath)}
               </React.Fragment>
             )
           })}
-
           <DropZone
             data={{
-              path: String(dropZoneInitialPath),
+              path: `${layout.length}`,
               childrenCount: layout.length,
             }}
             onDrop={handleDrop}
-            path={String(dropZoneInitialPath)}
+            isLast
           />
         </div>
 
-        {/* TrashDropZone */}
         <TrashDropZone
           data={{
             layout,
@@ -212,4 +167,4 @@ const App = () => {
     </div>
   )
 }
-export default App
+export default Container

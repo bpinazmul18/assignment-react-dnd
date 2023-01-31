@@ -19,6 +19,7 @@ const TrashDropZone = ({ data, onDrop }) => {
       const itemRowChildrenLength =
         layout[itemPathRowIndex] && layout[itemPathRowIndex].children.length
 
+      // prevent removing a col when row has only one col
       if (
         item.type === COLUMN &&
         itemRowChildrenLength &&
