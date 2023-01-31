@@ -48,7 +48,7 @@ export const SIDEBAR_ITEMS = [
   },
   {
     id: shortid.generate(),
-    type: ROW,
+    type: SIDEBAR_ITEM,
     component: {
       type: ROW,
       content: 'Some Row',

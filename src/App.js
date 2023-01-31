@@ -1,146 +1,36 @@
 import React, { useState, useCallback } from 'react'
-import shortid from 'shortid'
 import DropZone from './components/DropZone'
-import Row from './components/Row'
 import SideBarItem from './components/SideBarItem'
-import TrashDropZone from './components/TrashDropZone'
-import {
-  SIDEBAR_ITEMS,
-  COLUMN,
-  SIDEBAR_ITEM,
-  COMPONENT,
-  ROW,
-} from './constants'
-import initialData from './initial-data'
+import { handleMoveToDifferentParent } from './helpers'
 
-import {
-  handleMoveWithinParent,
-  handleMoveToDifferentParent,
-  handleMoveSidebarComponentIntoParent,
-  handleRemoveItemFromLayout,
-} from './helpers'
+import { SIDEBAR_ITEMS } from './constants'
+import initialData from './initial-data'
 
 const App = () => {
   const initialLayout = initialData.layout
   const initialComponents = initialData.components
-  const dropZoneInitialPath = 0
   const [layout, setLayout] = useState(initialLayout)
   const [components, setComponents] = useState(initialComponents)
 
-  const handleDropToTrashBin = useCallback(
-    (dropZone, item) => {
-      const splitItemPath = item.path.split('-')
-      setLayout(handleRemoveItemFromLayout(layout, splitItemPath))
-    },
-    [layout]
-  )
-
+  // HandleDrop
   const handleDrop = useCallback(
     (dropZone, item) => {
+      // console.log('dropZone', dropZone)
+      // console.log('item', item)
+
       const splitDropZonePath = dropZone.path.split('-')
       const pathToDropZone = splitDropZonePath.slice(0, -1).join('-')
 
       const newItem = { id: item.id, type: item.type }
 
-      console.log('check item type', item)
-      // Row
-      if (item.type === ROW) {
-        return setLayout(
-          handleMoveSidebarComponentIntoParent(
-            layout,
-            splitDropZonePath,
-            newItem
-          )
-        )
-        // 1. Move sidebar item into page
-        // const newComponent = {
-        //   id: shortid.generate(),
-        //   ...item.component,
-        // }
+      // const splitItemPath = item.path.split('-')
+      // const pathToItem = splitItemPath.slice(0, -1).join('-')
 
-        // const newItem = {
-        //   id: newComponent.id,
-        //   type: COMPONENT,
-        // }
-
-        // setComponents({
-        //   ...components,
-        //   [newComponent.id]: newComponent,
-        // })
-
-        // setLayout(
-        //   handleMoveSidebarComponentIntoParent(
-        //     layout,
-        //     splitDropZonePath,
-        //     newItem
-        //   )
-        // )
-        return
-      }
-
-      if (item.type === COLUMN) {
-        newItem.children = item.children
-      }
-
-      // sidebar into
-      if (item.type === SIDEBAR_ITEM) {
-        // 1. Move sidebar item into page
-        const newComponent = {
-          id: shortid.generate(),
-          ...item.component,
-        }
-        const newItem = {
-          id: newComponent.id,
-          type: COMPONENT,
-        }
-        setComponents({
-          ...components,
-          [newComponent.id]: newComponent,
-        })
-        setLayout(
-          handleMoveSidebarComponentIntoParent(
-            layout,
-            splitDropZonePath,
-            newItem
-          )
-        )
-        return
-      }
-
-      // move down here since sidebar items dont have path
-      const splitItemPath = item.path.split('-')
-
-      const pathToItem = splitItemPath.slice(0, -1).join('-')
-
-      // 2. Pure move (no create)
-      if (splitItemPath.length === splitDropZonePath.length) {
-        // 2.a. move within parent
-        if (pathToItem === pathToDropZone) {
-          setLayout(
-            handleMoveWithinParent(layout, splitDropZonePath, splitItemPath)
-          )
-          return
-        }
-
-        // 2.b. OR move different parent
-        // TODO FIX columns. item includes children
-        setLayout(
-          handleMoveToDifferentParent(
-            layout,
-            splitDropZonePath,
-            splitItemPath,
-            newItem
-          )
-        )
-        return
-      }
-
-      // 3. Move + Create
       setLayout(
         handleMoveToDifferentParent(
           layout,
           splitDropZonePath,
-          splitItemPath,
+          pathToDropZone,
           newItem
         )
       )
@@ -148,28 +38,14 @@ const App = () => {
     [layout, components]
   )
 
-  const renderRow = (row, currentPath) => {
-    return (
-      <Row
-        key={row.id}
-        data={row}
-        handleDrop={handleDrop}
-        components={components}
-        path={currentPath}
-      />
-    )
-  }
-
   return (
     <div className="body">
-      {/* SideBar */}
       <div className="sideBar">
-        {Object.values(SIDEBAR_ITEMS).map((sideBarItem) => (
-          <SideBarItem key={sideBarItem.id} data={sideBarItem} />
+        {SIDEBAR_ITEMS.map((item) => (
+          <SideBarItem key={item.id} data={item} />
         ))}
       </div>
 
-      {/* PageContainer */}
       <div className="pageContainer">
         <div className="page">
           {layout.map((row, index) => {
@@ -185,29 +61,20 @@ const App = () => {
                   onDrop={handleDrop}
                   path={currentPath}
                 />
-
-                {renderRow(row, currentPath)}
+                {/* {renderRow(row, currentPath)} */}
               </React.Fragment>
             )
           })}
 
           <DropZone
             data={{
-              path: String(dropZoneInitialPath),
+              path: `${layout.length}`,
               childrenCount: layout.length,
             }}
             onDrop={handleDrop}
-            path={String(dropZoneInitialPath)}
+            isLast
           />
         </div>
-
-        {/* TrashDropZone */}
-        <TrashDropZone
-          data={{
-            layout,
-          }}
-          onDrop={handleDropToTrashBin}
-        />
       </div>
     </div>
   )
