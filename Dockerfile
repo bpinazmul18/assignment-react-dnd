@@ -1,7 +1,7 @@
 FROM node:19.6.0-alpine3.17
 
-RUN addgroup app && adduser -S -G app app
-USER app
+# RUN addgroup app && adduser -S -G app app
+# USER app
 
 WORKDIR /app
 COPY package*.json .
@@ -11,7 +11,7 @@ RUN yarn install
 COPY . .
 
 ENV API_URL=http://api/my-app.com/
-EXPOSE 3001
+EXPOSE 3000
 
 CMD ["yarn", "start"]
 
